@@ -1,0 +1,9 @@
+Coption 1 = file, option 2 = text. Choose your fate:
+Found 5 words.
+Coption 1 = file, option 2 = text. Choose your fate:
+Found 9 words.
+Coption 1 = file, option 2 = text. Choose your fate:
+EmptyFileException: file1.txt was empty
+TooSmallText: Only found 0 words.
+Coption 1 = file, option 2 = text. Choose your fate:
+TooSmallText: Only found 2 words.

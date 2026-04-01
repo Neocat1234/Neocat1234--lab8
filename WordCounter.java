@@ -4,7 +4,7 @@ import java.util.Scanner;
 
 public class WordCounter {
 
-    private static Scanner inputScanner = new Scanner(System.in);
+
 
     //counts all words in the text, throws TooSmallText if fewer than 5 words, and InvalidStopwordException if the stopword is not found
 
@@ -13,24 +13,28 @@ public class WordCounter {
         Pattern regex = Pattern.compile("[a-zA-Z0-9']+");
         Matcher regexMatcher = regex.matcher(text);
         int count = 0;
+        int totalCount = 0;
         boolean stopwordFound = false;
+        boolean countingDone = false;
 
         while (regexMatcher.find()) { //counts using regex
-            count++;
-            String word = regexMatcher.group();
-            if (stopword != null && word.equals(stopword)) {
-                stopwordFound = true;
-                break;
+            totalCount++;
+            if (!countingDone) {
+                count++;
+                String word = regexMatcher.group();
+                if (stopword != null && word.equals(stopword)) {
+                    stopwordFound = true;
+                    countingDone = true;
+                }
             }
         }
 
-        if (count < 5) { //checks if text is too small
-            throw new TooSmallText("Text contains fewer than 5 words.");
+        if (totalCount < 5) { //checks if text is too small
+            throw new TooSmallText("Only found " + totalCount + " words.");
         }
 
         if (stopword != null && !stopwordFound) { //checks if stopword is missing
-            throw new InvalidStopwordException(
-                    "Stopword '" + stopword + "' was not found in the text.");
+            throw new InvalidStopwordException("Couldn't find stopword: " + stopword);
         }
 
         return count;
@@ -44,11 +48,12 @@ public class WordCounter {
                 StringBuffer sb = new StringBuffer();
                 String line;
                 while ((line = reader.readLine()) != null) {
-                    sb.append(line).append("\n");
+                    if (sb.length() > 0) sb.append("\n");
+                    sb.append(line);
                 }
 
                 if (sb.length() == 0) {
-                    throw new EmptyFileException("File is empty: " + filePath);
+                    throw new EmptyFileException(filePath + " was empty");
                 }
 
                 return sb;
@@ -57,16 +62,17 @@ public class WordCounter {
                 throw e;
             } catch (IOException e) {
                 System.out.print("error with our file path.");
-                filePath = inputScanner.nextLine();
+                filePath = new Scanner(System.in).nextLine();
             }
         }
     }
 
     public static void main(String[] args) {
 //take an option from the user
+        Scanner inputScanner = new Scanner(System.in);
         int choice = 0;
         while (choice != 1 && choice != 2) {
-            System.out.print("Coption 1 = file, option 2 = text. Choose your fate:");
+            System.out.println("Coption 1 = file, option 2 = text. Choose your fate:");
             try {
                 choice = Integer.parseInt(inputScanner.nextLine().trim());
                 if (choice != 1 && choice != 2) {
@@ -96,7 +102,7 @@ public class WordCounter {
         //count words, handle exceptions
         try {
             int count = processText(content, stopword);
-            System.out.println("Word count: " + count);
+            System.out.println("Found " + count + " words.");
         } catch (TooSmallText e) {
             System.out.println(e);
         } catch (InvalidStopwordException e) {
@@ -105,7 +111,7 @@ public class WordCounter {
             String newStopword = inputScanner.nextLine();
             try {
                 int count = processText(content, newStopword);
-                System.out.println("Word count: " + count);
+                System.out.println("Found " + count + " words.");
             } catch (InvalidStopwordException e2) {
                 System.out.println(newStopword + " error stop word was not found in the text.");
             } catch (TooSmallText e2) {
